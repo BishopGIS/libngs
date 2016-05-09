@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/bishop/work/projects/mobile/libngs/src/api.cpp
+api.h
+/home/bishop/work/projects/mobile/libngs/src/api.h
+version.h
+/home/bishop/work/projects/mobile/libngs/src/version.h
+
+/home/bishop/work/projects/mobile/libngs/src/api.h
+common.h
+/home/bishop/work/projects/mobile/libngs/src/common.h
+
+/home/bishop/work/projects/mobile/libngs/src/common.h
+
+/home/bishop/work/projects/mobile/libngs/src/version.h
+

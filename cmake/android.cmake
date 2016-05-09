@@ -4,13 +4,13 @@
 #  Author: Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 #  Language: C/C++
 ################################################################################
-#  GNU General Public License v2
+#  GNU Lesser General Public Licens v3
 #
 #  Copyright (c) 2016 NextGIS, <info@nextgis.com>
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 2 of the License, or
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,

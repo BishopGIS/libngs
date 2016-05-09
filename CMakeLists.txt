@@ -4,13 +4,13 @@
 #  Author: Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 #  Language: C/C++
 ################################################################################
-#  GNU General Public License v2
+#  GNU Lesser General Public Licens v3
 #
 #  Copyright (c) 2016 NextGIS, <info@nextgis.com>
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 2 of the License, or
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
@@ -22,20 +22,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-# http://ph0b.com/new-android-studio-ndk-support/
-# http://ph0b.com/android-studio-gradle-and-ndk-integration/
-# http://www.sitepoint.com/using-c-and-c-code-in-an-android-app-with-the-ndk/
-# https://habrahabr.ru/post/203014/
-# http://kvurd.com/blog/compiling-a-cpp-library-for-android-with-android-studio/
-# http://stackoverflow.com/questions/19343797/building-a-toolchain-with-cmake-to-cross-compile-for-android
-# https://habrahabr.ru/company/alawar/blog/216473/
-# https://github.com/taka-no-me/android-cmake
-# https://github.com/Uroc327Mirrors/pixellight/blob/master/cmake/Android/Apk.cmake
-# https://github.com/Discordia/android-cmake/blob/master/android.apk.cmake
-# http://stackoverflow.com/questions/19207721/build-android-ndk-project-with-cmake
-# https://github.com/libmx3/mx3/tree/master/src
-# https://github.com/mapbox/mapbox-gl-native/tree/master/platform/ios
- 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
 # some init settings
@@ -48,7 +34,10 @@ set_property(CACHE BUILD_TARGET_PLATFORM PROPERTY STRINGS "ANDROID" "IOS" "Deskt
 
 if(BUILD_TARGET_PLATFORM STREQUAL "ANDROID")
     include(android)
+elseif(BUILD_TARGET_PLATFORM STREQUAL "IOS")
+    include(ios)    
 endif()
+
 
 project(ngmap)
 

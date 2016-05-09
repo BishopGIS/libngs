@@ -1,0 +1,4 @@
+/home/bishop/work/projects/mobile/libngs/build/inst/lib/libngmapstatic.a
+/home/bishop/work/projects/mobile/libngs/build/inst/include/version.h
+/home/bishop/work/projects/mobile/libngs/build/inst/include/common.h
+/home/bishop/work/projects/mobile/libngs/build/inst/include/api.h

@@ -4,13 +4,13 @@
 #  Author: Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 #  Language: C/C++
 ################################################################################
-#  GNU General Public License v2
+#  GNU Lesser General Public Licens v3
 #
 #  Copyright (c) 2016 NextGIS, <info@nextgis.com>
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 2 of the License, or
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
@@ -62,6 +62,10 @@ if(BUILD_SHARED_LIBS)
     set_target_properties (${LIB_NAME} PROPERTIES DEFINE_SYMBOL NGW_EXPORTS)
 
     set(TARGET_LIBS ${LIB_NAME} PARENT_SCOPE)
+endif()
+    set_target_properties (${LIB_NAME} PROPERTIES FRAMEWORK ON)
+if(IOS)
+
 endif()
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )

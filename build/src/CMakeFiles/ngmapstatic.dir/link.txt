@@ -1,0 +1,2 @@
+/usr/bin/ar qc libngmapstatic.a  CMakeFiles/ngmapstatic.dir/api.cpp.o
+/usr/bin/ranlib libngmapstatic.a
