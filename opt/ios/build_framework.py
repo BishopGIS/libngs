@@ -93,15 +93,16 @@ class Builder:
         args = [
             "cmake",
             "-GUnix Makefiles",
-            "-DBUILD_TARGET_PLATFORM=IOS",
-            "-DAPPLE_FRAMEWORK=ON",
+            "-DBUILD_TARGET_PLATFORM=IOS",            
             "-DCMAKE_INSTALL_PREFIX=install",
             "-DCMAKE_BUILD_TYPE=Release",
             "-DIOS_ABI=" + arch,
         ]
         
         if target == 'iPhoneSimulator':
-            args.append("-DIOS_SIMULATOR=ON")
+            args.append("-DIOS_PLATFORM=SIMULATOR")
+        else:
+            args.append("-DIOS_PLATFORM=OS")        
         return args
 
     def getBuildCommand(self, arch, target):
