@@ -28,6 +28,14 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT CMAKE_BUILD_TYPE STREQUAL "Rele
     message(FATAL_ERROR "iOS not support build type ${CMAKE_BUILD_TYPE}")
 endif()
 
+if(IOS_SIMULATOR)
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/iossimulator.toolchain.cmake
+        CACHE PATH "Select android toolchain file path")
+else()
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/cmake/ios.toolchain.cmake
+        CACHE PATH "Select android toolchain file path")
+endif()
+
 # This file is based off of the Platform/Darwin.cmake and Platform/UnixPaths.cmake
 # files which are included with CMake 2.8.4
 # It has been altered for iOS development
@@ -73,6 +81,18 @@ set (no_warn "-Wno-unused-function -Wno-overloaded-virtual")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${no_warn}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=hidden -fvisibility-inlines-hidden ${no_warn}")
 
+if(IOS_SIMULATOR)
+    set(IOS_ABI "i386" CACHE STRING "Select IOS ABI")
+    set_property(CACHE ANDROID_ABI PROPERTY STRINGS "i386" "x86_64")
+
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${IOS_ABI} -mios-simulator-version-min=7.0")
+else()
+    set(IOS_ABI "armv7" CACHE STRING "Select IOS ABI")
+    set_property(CACHE ANDROID_ABI PROPERTY STRINGS "armv7" "armv7s" "arm64")
+
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${IOS_ABI})
+endif()
+
 set (CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -fomit-frame-pointer -ffast-math")
 
 if (HAVE_FLAG_SEARCH_PATHS_FIRST)
@@ -96,13 +116,12 @@ if (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
 # Setup iOS developer location
-if (IPHONEOS)
+if(IOS_SIMULATOR)
+    set (_CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneSimulator.platform/Developer")
+else())
     set (_CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneOS.platform/Developer")
-else ()
-    if (IPHONESIMULATOR)
-        set (_CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneSimulator.platform/Developer")
-    endif ()
 endif ()
+
 # Find installed iOS SDKs
 file (GLOB _CMAKE_IOS_SDKS "${_CMAKE_IOS_DEVELOPER_ROOT}/SDKs/*")
 

@@ -56,13 +56,12 @@ class Builder:
         outdir = os.path.abspath(outdir)
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
-        mainWD = os.path.join(outdir, "build")
         dirs = []
 
         xcode_ver = getXCodeMajor()
 
         for t in self.targets:
-            mainBD = self.getBD(mainWD, t)
+            mainBD = self.getBD(outdir, t)
             dirs.append(mainBD)
             cmake_flags = []
             if xcode_ver >= 7 and t[1] == 'iPhoneOS':
@@ -90,26 +89,38 @@ class Builder:
         return toolchain
 
     def getCMakeArgs(self, arch, target):
+        
         args = [
             "cmake",
-            "-GXcode",
+            "-GUnix Makefiles",
             "-DAPPLE_FRAMEWORK=ON",
             "-DCMAKE_INSTALL_PREFIX=install",
             "-DCMAKE_BUILD_TYPE=Release",
+            "-DIOS_ABI=" + arch,
         ]
+        
+        if target == 'iPhoneSimulator':
+            args.append("-DIOS_SIMULATOR=ON")
         return args
 
     def getBuildCommand(self, arch, target):
         buildcmd = [
-            "xcodebuild",
-            "IPHONEOS_DEPLOYMENT_TARGET=6.0",
-            "ARCHS=%s" % arch,
-            "-sdk", target.lower(),
-            "-configuration", "Release",
-            "-parallelizeTargets",
-            "-jobs", "4"
+            "cmake",
+            "--build",
+            ".",
         ]
         return buildcmd
+    
+    
+    def getInstallCommand(self, arch, target):
+        buildcmd = [
+            "cmake",
+            "--build",
+            ".",
+            "--target", 
+            "install",
+        ]
+        return buildcmd    
 
     def getInfoPlist(self, builddirs):
         return os.path.join(builddirs[0], "ios", "Info.plist")
@@ -117,8 +128,6 @@ class Builder:
     def buildOne(self, arch, target, builddir, cmakeargs = []):
         # Run cmake
         toolchain = self.getToolchain(arch, target)
-        cmakecmd = self.getCMakeArgs(arch, target) + \
-            (["-DCMAKE_TOOLCHAIN_FILE=%s" % toolchain] if toolchain is not None else [])
         if arch.startswith("armv") or arch.startswith("arm64"):
             cmakecmd.append("-DENABLE_NEON=ON")
         cmakecmd.append(self.ngs)
@@ -129,8 +138,10 @@ class Builder:
         if os.path.isdir(clean_dir):
             shutil.rmtree(clean_dir)
         buildcmd = self.getBuildCommand(arch, target)
-        execute(buildcmd + ["-target", "ALL_BUILD", "build"], cwd = builddir)
-        execute(["cmake", "-P", "cmake_install.cmake"], cwd = builddir)
+        #execute(buildcmd + ["-target", "ALL_BUILD", "build"], cwd = builddir)
+        #execute(["cmake", "-P", "cmake_install.cmake"], cwd = builddir)
+        execute(buildcmd, cwd = builddir)
+        execute(["cmake", "--build", ".", "--target", "install"], cwd = builddir)
 
     def mergeLibs(self, builddir):
         res = os.path.join(builddir, "lib", "Release", "libngs_merged.a")
