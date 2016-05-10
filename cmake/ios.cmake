@@ -36,12 +36,7 @@ else()
         CACHE PATH "Select android toolchain file path")
 endif()
 
-# This file is based off of the Platform/Darwin.cmake and Platform/UnixPaths.cmake
-# files which are included with CMake 2.8.4
-# It has been altered for iOS development
-set (UNIX 1)
-set (APPLE 1)
-set (IOS 1)
+set (IOS ON)
 
 # Darwin versions:
 #   6.x == Mac OSX 10.2
@@ -58,19 +53,26 @@ if (NOT DEFINED HAVE_FLAG_SEARCH_PATHS_FIRST)
     set (HAVE_FLAG_SEARCH_PATHS_FIRST 0)
     if ("${DARWIN_MAJOR_VERSION}" GREATER 6)
         set (HAVE_FLAG_SEARCH_PATHS_FIRST 1)
-    endif ("${DARWIN_MAJOR_VERSION}" GREATER 6)
-endif (NOT DEFINED HAVE_FLAG_SEARCH_PATHS_FIRST)
+    endif ()
+endif ()
 # More desirable, but does not work:
 #INCLUDE(CheckCXXCompilerFlag)
 #CHECK_CXX_COMPILER_FLAG("-Wl,-search_paths_first" HAVE_FLAG_SEARCH_PATHS_FIRST)
 
-set (CMAKE_SHARED_LIBRARY_PREFIX "lib")
-set (CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
-set (CMAKE_SHARED_MODULE_PREFIX "lib")
-set (CMAKE_SHARED_MODULE_SUFFIX ".so")
-set (CMAKE_MODULE_EXISTS 1)
-set (CMAKE_DL_LIBS "")
+find_program(XCODE_CONFIG xcode-select)
+if(NOT XCODE_CONFIG)
+    message(FATAL_ERROR "iOS SDK is not install or xcode-select is not found")
+endif()
 
+exec_program(${XCODE_CONFIG} ARGS -print-path OUTPUT_VARIABLE XCODE_ROOT)
+set(XCODE_ARM_ROOT "${XCODE_ROOT}/Platforms/iPhoneOS.platform/Developer")
+set(XCODE_SIM_ROOT "${XCODE_ROOT}/Platforms/iPhoneSimulator.platform/Developer")
+set(XCODE_TOOLCHAIN_BIN "${XCODE_ROOT}/Toolchains/XcodeDefault.xctoolchain/usr/bin")
+set(CMAKE_CXX_COMPILER "${XCODE_TOOLCHAIN_BIN}/clang++")
+set(CMAKE_C_COMPILER "${XCODE_TOOLCHAIN_BIN}/clang")
+ 
+message(STATUS "cxx compiler: ${CMAKE_CXX_COMPILER}") 
+ 
 set (CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
 set (CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set (CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
@@ -83,14 +85,14 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -fvisibility=hidden -fvi
 
 if(IOS_SIMULATOR)
     set(IOS_ABI "i386" CACHE STRING "Select IOS ABI")
-    set_property(CACHE ANDROID_ABI PROPERTY STRINGS "i386" "x86_64")
+    set_property(CACHE IOS_ABI PROPERTY STRINGS "i386" "x86_64")
 
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${IOS_ABI} -mios-simulator-version-min=7.0")
 else()
     set(IOS_ABI "armv7" CACHE STRING "Select IOS ABI")
-    set_property(CACHE ANDROID_ABI PROPERTY STRINGS "armv7" "armv7s" "arm64")
+    set_property(CACHE IOS_ABI PROPERTY STRINGS "armv7" "armv7s" "arm64")
 
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${IOS_ABI})
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${IOS_ABI}")
 endif()
 
 set (CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -fomit-frame-pointer -ffast-math")
@@ -117,10 +119,10 @@ endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
 # Setup iOS developer location
 if(IOS_SIMULATOR)
-    set (_CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneSimulator.platform/Developer")
-else())
-    set (_CMAKE_IOS_DEVELOPER_ROOT "/Developer/Platforms/iPhoneOS.platform/Developer")
-endif ()
+    set (_CMAKE_IOS_DEVELOPER_ROOT ${XCODE_SIM_ROOT})
+else()
+    set (_CMAKE_IOS_DEVELOPER_ROOT ${XCODE_ARM_ROOT})
+endif()
 
 # Find installed iOS SDKs
 file (GLOB _CMAKE_IOS_SDKS "${_CMAKE_IOS_DEVELOPER_ROOT}/SDKs/*")
@@ -133,9 +135,9 @@ if (_CMAKE_IOS_SDKS)
 
     # Set the sysroot default to the most recent SDK
     set (CMAKE_OSX_SYSROOT ${_CMAKE_IOS_SDK_ROOT} CACHE PATH "Sysroot used for iOS support")
+    message(STATUS "sysroot: ${CMAKE_OSX_SYSROOT}")
 
-    # set the architecture for iOS - this env var sets armv6,armv7 and appears to be XCode's standard. The other found is ARCHS_UNIVERSAL_IPHONE_OS but that is armv7 only
-    set (CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)" CACHE string  "Build architecture for iOS")
+    set (CMAKE_OSX_ARCHITECTURES "$(IOS_ABI)" CACHE string  "Build architecture for iOS")
 
     # Set the default based on this file and not the environment variable
     set (CMAKE_FIND_ROOT_PATH ${_CMAKE_IOS_DEVELOPER_ROOT} ${_CMAKE_IOS_SDK_ROOT} CACHE string  "iOS library search path root")

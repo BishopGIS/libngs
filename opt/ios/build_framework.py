@@ -93,6 +93,7 @@ class Builder:
         args = [
             "cmake",
             "-GUnix Makefiles",
+            "-DBUILD_TARGET_PLATFORM=IOS",
             "-DAPPLE_FRAMEWORK=ON",
             "-DCMAKE_INSTALL_PREFIX=install",
             "-DCMAKE_BUILD_TYPE=Release",
@@ -127,7 +128,7 @@ class Builder:
 
     def buildOne(self, arch, target, builddir, cmakeargs = []):
         # Run cmake
-        toolchain = self.getToolchain(arch, target)
+        cmakecmd = self.getCMakeArgs(arch, target)
         if arch.startswith("armv") or arch.startswith("arm64"):
             cmakecmd.append("-DENABLE_NEON=ON")
         cmakecmd.append(self.ngs)
@@ -144,7 +145,7 @@ class Builder:
         execute(["cmake", "--build", ".", "--target", "install"], cwd = builddir)
 
     def mergeLibs(self, builddir):
-        res = os.path.join(builddir, "lib", "Release", "libngs_merged.a")
+        res = os.path.join(builddir, "install", "lib", "libngs_merged.a")
         libs = glob.glob(os.path.join(builddir, "install", "lib", "*.a"))
         print("Merging libraries:\n\t%s" % "\n\t".join(libs), file=sys.stderr)
         execute(["libtool", "-static", "-o", res] + libs)
@@ -165,7 +166,7 @@ class Builder:
         shutil.copytree(os.path.join(builddirs[0], "install", "include", "ngs"), os.path.join(dstdir, "Headers"))
 
         # make universal static lib
-        libs = [os.path.join(d, "lib", "Release", libname) for d in builddirs]
+        libs = [os.path.join(d, "install", "lib", libname) for d in builddirs]
         lipocmd = ["lipo", "-create"]
         lipocmd.extend(libs)
         lipocmd.extend(["-o", os.path.join(dstdir, name)])
