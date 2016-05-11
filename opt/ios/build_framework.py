@@ -96,7 +96,7 @@ class Builder:
             "-DBUILD_TARGET_PLATFORM=IOS",            
             "-DCMAKE_INSTALL_PREFIX=install",
             "-DCMAKE_BUILD_TYPE=Release",
-            "-DIOS_ABI=" + arch,
+            "-DIOS_ARCH=" + arch,
         ]
         
         if target == 'iPhoneSimulator':
